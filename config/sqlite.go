@@ -12,11 +12,14 @@ func InitializeSQLite() (*gorm.DB, error) {
 	logger := GetLogger("sqlite")
 
 	dbPath := "./db/main.db"
+
+	// check if the db file exists
 	_, err := os.Stat(dbPath)
 
 	if os.IsNotExist(err) {
 		logger.Info("database file not found, creating...")
 
+		// create db file and directory
 		err = os.MkdirAll("./db", os.ModePerm)
 
 		if err != nil {
@@ -32,6 +35,7 @@ func InitializeSQLite() (*gorm.DB, error) {
 		file.Close()
 	}
 
+	// create db and connect
 	db, err := gorm.Open(sqlite.Open("./db/main.db"), &gorm.Config{})
 
 	if err != nil {
@@ -39,6 +43,7 @@ func InitializeSQLite() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	//migrate schema
 	err = db.AutoMigrate(&schemas.Opening{})
 
 	if err != nil {
